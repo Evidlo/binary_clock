@@ -1,6 +1,6 @@
 # Binary Clock
 A homemade binary clock using an RTC module and attiny84.
-![Project Page](http://evanw.org/projects/binaryclock)
+[Project Page](http://evanw.org/projects/binaryclock)
 
 ![Binary Clock](/clock.jpg)
 
