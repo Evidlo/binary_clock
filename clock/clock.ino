@@ -1,5 +1,5 @@
-#Evan Widloski - 2015-07-18
-#Binary clock - Retrieves date from RTC and displays on a 4 digit binary display
+//Evan Widloski - 2015-07-18
+//Binary clock - Retrieves date from RTC and displays on a 4 digit binary display
 
 #include <USI_TWI_Master.h>
 #include <TinyWireM.h>
@@ -84,22 +84,19 @@ void loop() {
   TinyWireM.beginTransmission(DS3231);
   TinyWireM.write(0);
   TinyWireM.endTransmission();
-  TinyWireM.requestFrom(DS3231,7);
+  TinyWireM.requestFrom(DS3231,3);
   
   //read time from RTC module
   int seconds = toDec(TinyWireM.read());
   int minutes = toDec(TinyWireM.read());
-  int hours = TinyWireM.read() % 16;
-  TinyWireM.read();
-  TinyWireM.read();
-  TinyWireM.read();
-  
+  int hours = toDec(TinyWireM.read() % 32);  //cut off 12/24h bit before processing
+
+
   //write time to display in base 10
   shift_byte(((hours/10)<<4) + (hours%10));
   shift_byte(((minutes/10)<<4) + (minutes%10));
-  display();  
+  display(); 
 
-  //Serial.println("done");
   delay(100);
 
 }
