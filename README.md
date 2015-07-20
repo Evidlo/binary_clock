@@ -13,4 +13,4 @@ Parts
 
 Files
 ------
- - ![Schematic](/kicad/binary_clock.pro)
+ - ![Schematic](/kicad/binary_clock.pro) (coming soon)
