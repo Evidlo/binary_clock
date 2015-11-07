@@ -24,7 +24,6 @@ void setup() {
   digitalWrite(SHCP2,LOW);
   digitalWrite(STCP2,LOW);
   clear();
-
 }
 
 //clear the shift registers
@@ -75,6 +74,21 @@ void shift_byte(char c){
   }
 }
 
+//calculate DST
+//ripped from http://stackoverflow.com/questions/5590429/calculating-daylight-savings-time-from-only-date
+int DST(int month,int dow, int day){
+    //January, february, and december are out.
+    if (month < 3 || month > 11) { return false; }
+    //April to October are in
+    if (month > 3 && month < 11) { return true; }
+    int previousSunday = day - dow;
+    //In march, we are DST if our previous sunday was on or after the 8th.
+    if (month == 3) { return previousSunday >= 8; }
+    //In november we must be before the first sunday to be dst.
+    //That means the previous sunday must be before the 1st.
+    return previousSunday <= 0;
+}
+
 //convert bcd to decimal
 int toDec(char c){
   return (c/16)*10 + c%16;
@@ -84,14 +98,18 @@ void loop() {
   TinyWireM.beginTransmission(DS3231);
   TinyWireM.write(0);
   TinyWireM.endTransmission();
-  TinyWireM.requestFrom(DS3231,3);
+  TinyWireM.requestFrom(DS3231,6);
   
   //read time from RTC module
-  int seconds = toDec(TinyWireM.read());
-  int minutes = toDec(TinyWireM.read());
-  int hours = toDec(TinyWireM.read() % 32);  //cut off 12/24h bit before processing
+  int seconds = toDec(TinyWireM.read()); //second
+  int minutes = toDec(TinyWireM.read()); //minute
+  int hours = toDec(TinyWireM.read() % 32);  //cut off 12/24h bit before processing hours
+  int dow = toDec(TinyWireM.read()); //day of week
+  int day = toDec(TinyWireM.read()); //day of month
+  int month = toDec(TinyWireM.read() % 32); //cut off century bit before processing month
 
-
+  hours += DST(month,dow,day); //calculate DST
+  
   //write time to display in base 10
   shift_byte(((hours/10)<<4) + (hours%10));
   shift_byte(((minutes/10)<<4) + (minutes%10));
